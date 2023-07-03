@@ -1,8 +1,13 @@
 require("dotenv").config();
+
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const app = express();
+
+const baseDir = __dirname;
+process.env.IMAGE_UPLOAD_PATH = path.join(baseDir, "public", "upload", "image");
+process.env.TEXT_UPLOAD_PATH = path.join(baseDir, "public", "upload", "text");
 
 const imageController = require("./controllers/imageController");
 const translateController = require("./controllers/translateController");
@@ -34,6 +39,10 @@ app.get("/", (req, res) => {
 
 app.post("/api/translate", translateController.postTranslate);
 app.get("/api/image", imageController.getImageList);
-app.post("/api/image", upload.fields([{ name: "file" }, { name: "files" }]), imageController.uploadImage);
+app.post(
+  "/api/image",
+  upload.fields([{ name: "file" }, { name: "files" }]),
+  imageController.uploadImage
+);
 
 module.exports = app;
