@@ -9,11 +9,13 @@ COPY bashrc /root/.bashrc
 # Set working directory
 WORKDIR /usr/src/app
 
-# Salin semua file proyek ke dalam kontainer
-COPY . .
+ADD . .
 
 # Install dependensi Node.js
 RUN npm install
+
+# Salin semua file proyek ke dalam kontainer
+COPY . .
 
 # Expose port yang akan digunakan oleh aplikasi
 EXPOSE 3000
