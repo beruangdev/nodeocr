@@ -8,3 +8,7 @@ services:
       - .:/usr/app/src
     ports:
       - 3000:3000
+    environment:
+      - IMAGE_UPLOAD_PATH=./public/upload/image
+      - TEXT_UPLOAD_PATH=./public/upload/text
+      - PORT=3000

@@ -71,6 +71,7 @@ exports.getImageList = (req, res) => {
         res.status(500).json({ error: 'Failed to read image information.' });
       });
   } catch (error) {
+    console.log("🚀 ~ file: imageController.js:74 ~ error:", error)
     res.status(500).json({ error: 'Failed to read image folder.' });
   }
 };
