@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Image</title>
+    <!-- Tambahkan tautan ke Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+      };
+    </script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <link rel="stylesheet" href="/styles/modal.css" />
+  </head>
+
+  <body
+    class="min-h-screen bg-gray-100 dark:bg-gray-800 transition-colors duration-500 ease-in-out dark:text-white p-14 pt-4"
+    x-data="welcomePage"
+    x-init="initWelcomePage()"
+    @keydown.escape="showModal = false"
+    x-cloak
+  >
+    <!-- BUTTON THEME -->
+    <button
+      id="toggleDarkMode"
+      class="bg-transparent border-none outline-none fixed top-4 right-4"
+    >
+      <!-- DARK MODE -->
+      <span class="hidden dark:inline"
+        ><svg viewBox="0 0 24 24" fill="none" class="w-6 h-6">
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M17.715 15.15A6.5 6.5 0 0 1 9 6.035C6.106 6.922 4 9.645 4 12.867c0 3.94 3.153 7.136 7.042 7.136 3.101 0 5.734-2.032 6.673-4.853Z"
+            class="fill-sky-400/20"
+          ></path>
+          <path
+            d="m17.715 15.15.95.316a1 1 0 0 0-1.445-1.185l.495.869ZM9 6.035l.846.534a1 1 0 0 0-1.14-1.49L9 6.035Zm8.221 8.246a5.47 5.47 0 0 1-2.72.718v2a7.47 7.47 0 0 0 3.71-.98l-.99-1.738Zm-2.72.718A5.5 5.5 0 0 1 9 9.5H7a7.5 7.5 0 0 0 7.5 7.5v-2ZM9 9.5c0-1.079.31-2.082.845-2.93L8.153 5.5A7.47 7.47 0 0 0 7 9.5h2Zm-4 3.368C5 10.089 6.815 7.75 9.292 6.99L8.706 5.08C5.397 6.094 3 9.201 3 12.867h2Zm6.042 6.136C7.718 19.003 5 16.268 5 12.867H3c0 4.48 3.588 8.136 8.042 8.136v-2Zm5.725-4.17c-.81 2.433-3.074 4.17-5.725 4.17v2c3.552 0 6.553-2.327 7.622-5.537l-1.897-.632Z"
+            class="fill-sky-500"
+          ></path>
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M17 3a1 1 0 0 1 1 1 2 2 0 0 0 2 2 1 1 0 1 1 0 2 2 2 0 0 0-2 2 1 1 0 1 1-2 0 2 2 0 0 0-2-2 1 1 0 1 1 0-2 2 2 0 0 0 2-2 1 1 0 0 1 1-1Z"
+            class="fill-sky-500"
+          ></path>
+        </svg>
+      </span>
+      <!-- LIGHT MODE -->
+      <span class="dark:hidden"
+        ><svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="w-6 h-6"
+        >
+          <path
+            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+            class="fill-sky-400/20 stroke-sky-500"
+          ></path>
+          <path
+            d="M12 4v1M17.66 6.344l-.828.828M20.005 12.004h-1M17.66 17.664l-.828-.828M12 20.01V19M6.34 17.664l.835-.836M3.995 12.004h1.01M6 6l.835.836"
+            class="stroke-sky-500"
+          ></path>
+        </svg>
+      </span>
+    </button>
+
+    <style>
+      .drag-drop-area {
+        border: 2px dashed #ccc;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+      }
+    </style>
+
+    <!-- Upload Input -->
+    <section
+      class="w-full p-6 bg-white dark:bg-gray-700 shadow-md rounded-lg mb-3"
+    >
+      <div
+        id="dropArea"
+        class="w-full h-[4rem] border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg"
+      >
+        <div class="flex items-center justify-center gap-2">
+          <p class="text-gray-500">Drag and drop files here or </p>
+          <label
+            for="image"
+            class="bg-indigo-500 dark:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg cursor-pointer"
+          >
+            Select files
+          </label>
+          <input
+            type="file"
+            id="image"
+            name="image"
+            class="hidden"
+            accept="image/*"
+            required
+            multiple
+          />
+        </div>
+      </div>
+
+      <div id="uploadProgressContainer"></div>
+    </section>
+
+    <!-- Image List -->
+    <section
+      class="w-full space-y-8 p-6 bg-white dark:bg-gray-700 shadow-md rounded-lg"
+      x-data="imageList()"
+      x-init="init()"
+    >
+      <!-- Image Grid -->
+      <div class="grid grid-cols-3 gap-4 gap-y-8">
+        <template x-for="image in images" :key="image.id">
+          <div class="flex flex-col">
+            <button x-on:click="showModal = true; selectedImage = image">
+              <img
+                :src="image.url"
+                alt="Image"
+                class="object-cover rounded-lg"
+              />
+            </button>
+            <p
+              class="mt-2 text-gray-800 dark:text-white"
+              x-text="image.filename"
+            ></p>
+          </div>
+        </template>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-center mt-8">
+        <ul class="flex space-x-2">
+          <li>
+            <button
+              class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded"
+              :class="{ 'opacity-50': currentPage === 1 }"
+              :disabled="currentPage === 1"
+              @click="prevPage()"
+            >
+              Previous
+            </button>
+          </li>
+          <li>
+            <template x-for="page in totalPages" :key="page">
+              <button
+                class="px-3 py-1 text-white rounded"
+                :class="{ 'bg-blue-800': currentPage === page }"
+                @click="goToPage(page)"
+                x-text="page"
+              ></button>
+            </template>
+          </li>
+          <li>
+            <button
+              class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded"
+              :class="{ 'opacity-50': currentPage === totalPages }"
+              :disabled="currentPage === totalPages"
+              @click="nextPage()"
+            >
+              Next
+            </button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <div
+      x-show="showModal"
+      class="fixed inset-0 z-50"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        class="flex items-end justify-center min-h-screen px-4 text-center md:items-center sm:block sm:p-0"
+      >
+        <div
+          x-cloak
+          @click="showModal = false"
+          x-show="showModal"
+          x-transition:enter="transition ease-out duration-300 transform"
+          x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100"
+          x-transition:leave="transition ease-in duration-200 transform"
+          x-transition:leave-start="opacity-100"
+          x-transition:leave-end="opacity-0"
+          class="fixed inset-0 transition-opacity bg-black/70 backdrop-blur-sm"
+          aria-hidden="true"
+        ></div>
+
+        <div
+          x-cloak
+          x-show="showModal"
+          x-transition:enter="transition ease-out duration-300 transform"
+          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+          x-transition:leave="transition ease-in duration-200 transform"
+          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          class="inline-block w-full max-w-[97%] py-3 px-6 my-4 overflow-hidden text-left transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl"
+        >
+          <!-- modal body -->
+          <div x-data="{ activeTab: 'IMG' }">
+            <ul class="flex flex-wrap gap-2 mb-2">
+              <template x-for="item in ['IMG', 'Text', 'Text ID']" :key="item">
+                <li>
+                  <button
+                    type="button"
+                    @click.prevent="activeTab = item"
+                    @click="onChangeTab(item)"
+                    :class="activeTab === item ? 'bg-blue-600 text-white' : 'hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-900/40 dark:hover:text-white'"
+                    class="inline-block px-4 py-1.5 rounded-lg"
+                    x-text="item"
+                  ></button>
+                </li>
+              </template>
+            </ul>
+
+            <div class="content overflow-y-auto max-h-[38rem]">
+              <div x-cloak x-show="activeTab === 'IMG'">
+                <img
+                  :src="selectedImage.url"
+                  alt="Image"
+                  class="object-cover rounded-lg"
+                />
+              </div>
+              <div x-cloak x-show="activeTab === 'Text'">
+                <textarea
+                  rows="27"
+                  class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="Loading..."
+                  x-text="selectedImage.text"
+                  x-model="selectedImage.text"
+                ></textarea>
+              </div>
+              <div x-cloak x-show="activeTab === 'Text ID'">
+                <textarea
+                  rows="27"
+                  class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="Loading..."
+                  x-text="selectedImage.textID"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/scripts/theme.js"></script>
+    <script src="/scripts/welcome.js"></script>
+    <script src="/scripts/upload.js"></script>
+    <script src="/scripts/image-list.js"></script>
+    <script src="/scripts/copy-upload-response.js"></script>
+  </body>
+</html>

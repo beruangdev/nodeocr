@@ -1,0 +1,4 @@
+node_modules
+public/upload/image/*
+public/upload/image-*/*
+public/upload/text/*
