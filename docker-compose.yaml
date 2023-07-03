@@ -11,4 +11,3 @@ services:
     environment:
       - IMAGE_UPLOAD_PATH=./public/upload/image
       - TEXT_UPLOAD_PATH=./public/upload/text
-      - PORT=3000
