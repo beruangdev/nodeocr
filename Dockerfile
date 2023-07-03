@@ -5,7 +5,7 @@ COPY bashrc /root/.bashrc
 
 WORKDIR /usr/src/app
 
-ADD package.json .
+ADD . .
 RUN npm install
 
 COPY . .

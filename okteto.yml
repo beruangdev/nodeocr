@@ -3,7 +3,6 @@ name: nodeocr
 # The build section defines how to build the images of your development environment
 # More info: https://www.okteto.com/docs/reference/manifest/#build
 build:
-
   # You can use the following env vars to refer to this image in your deploy commands:
   #  - OKTETO_BUILD_NODEOCR_REGISTRY: image registry
   #  - OKTETO_BUILD_NODEOCR_REPOSITORY: image repo
@@ -17,13 +16,12 @@ build:
 # More info: https://www.okteto.com/docs/reference/manifest/#deploy
 deploy:
   compose:
-    file: okteto.yml
+    file: docker-compose.yaml
 
 # The dependencies section defines other git repositories to be deployed as part of your development environment
 # More info: https://www.okteto.com/docs/reference/manifest/#dependencies
 # dependencies:
 #   - https://github.com/okteto/sample
-
 
 # The dev section defines how to activate a development container
 # More info: https://www.okteto.com/docs/reference/manifest/#dev
@@ -34,4 +32,3 @@ dev:
       - .:/usr/app/src
     forward:
       - 3000:3000
-
