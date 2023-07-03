@@ -1,7 +1,10 @@
 FROM node:20-alpine
 
-# Instal dependensi Python, make, dan g++
-RUN apk add --no-cache python3 make g++
+# Install dependencies
+RUN apk add --no-cache python3 make g++ vips-dev fftw-dev build-base
+
+# Update npm to the latest version
+RUN npm install -g npm@latest
 
 # Salin file bashrc ke dalam kontainer
 COPY bashrc /root/.bashrc
